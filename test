@@ -1,1 +1,303 @@
+# Complex Cookie Clicker Skript with Multiple Skins, Dynamic GUI Backgrounds,
+# Daily/Weekly Leaderboards, Personal Stats, and Secret Codes/Easter Eggs
 
+options:
+  cookie-slots: 36
+  title-main: &6Cookie Clicker
+  title-skins: &eSkins
+  title-achievements: &aAchievements
+  title-upgrades: &bUpgrades
+  title-leaderboards: &cLeaderboards
+
+# Skins definition (name|icon|background|default unlocked)
+variables:
+  {cookieclicker.skins::cookie} = "Cookie|cookie|brown stained glass pane|true"
+  {cookieclicker.skins::cake} = "Cake|cake|pink stained glass pane|false"
+  {cookieclicker.skins::donut} = "Donut|honeycomb|yellow stained glass pane|false"
+  {cookieclicker.skins::pumpkin} = "Pumpkin|carved pumpkin|orange stained glass pane|false"
+  {cookieclicker.skins::diamond} = "Diamond|diamond|light blue stained glass pane|false"
+
+# Player stats/data
+variables:
+  {cookieclicker.cookies::*} = 0
+  {cookieclicker.cookieslot::*} = 0
+  {cookieclicker.skin::*} = "cookie"
+  {cookieclicker.clicks::*} = 0
+  {cookieclicker.usedcodes::*} = ""
+  {cookieclicker.dailycookies::*::*} = 0
+  {cookieclicker.weeklycookies::*::*} = 0
+
+command /cookie:
+  trigger:
+    openCookieGUI(player, "main")
+
+command /cookie-code <text>:
+  trigger:
+    set {_code} to arg-1 parsed as text
+    set {_uuid} to player's uuid
+    if {_code} is "supercookie" and "supercookie" is not in {cookieclicker.usedcodes::%{_uuid}%::*}:
+      add 1000 to {cookieclicker.cookies::%{_uuid}%}
+      add "supercookie" to {cookieclicker.usedcodes::%{_uuid}%::*}
+      send "&aYou found a secret code and received 1000 cookies!"
+      stop
+    if {_code} is "shiny": #Reusable
+      set {cookieclicker.skin::%{_uuid}%} to "diamond"
+      send "&bSecret code unlocked the Diamond skin!"
+      stop
+    send "&cInvalid or already used secret code!"
+
+function openCookieGUI(p: player, guiname: text):
+  set {_uuid} to {_p}'s uuid
+  set {_skin} to {cookieclicker.skin::%{_uuid}%}
+  if {_skin} is not set:
+    set {_skin} to "cookie"
+    set {cookieclicker.skin::%{_uuid}%} to "cookie"
+  set {_sdata::*} to split({cookieclicker.skins::%{_skin}%}, "|")
+  set {_skinname} to {_sdata::1}
+  set {_cookieicon} to {_sdata::2}
+  set {_bgpane} to {_sdata::3}
+  if {_guiname} is "main":
+    open virtual chest with 5 rows named "{@title-main}" to {_p}
+    set {_slot} to random integer between 0 and {@cookie-slots} - 1
+    set {cookieclicker.cookieslot::%{_uuid}%} to {_slot}
+    loop {@cookie-slots} times:
+      set slot (loop-number - 1) of {_p}'s current inventory to {_bgpane} named " "
+    set slot {_slot} of {_p}'s current inventory to {_cookieicon} named "&6&lClick Me!" with lore "&7Cookies: &e%{cookieclicker.cookies::%{_uuid}%}%||&7Skin: &f%{_skinname}%"
+    set slot 36 of {_p}'s current inventory to leather helmet named "&eSkins"
+    set slot 37 of {_p}'s current inventory to paper named "&aAchievements"
+    set slot 38 of {_p}'s current inventory to diamond named "&bUpgrades"
+    set slot 39 of {_p}'s current inventory to nether star named "&cLeaderboards"
+    set slot 40 of {_p}'s current inventory to book named "&dPersonal Stats"
+    loop 4 times:
+      set slot (41 + loop-number - 1) of {_p}'s current inventory to gray stained glass pane named " "
+  else if {_guiname} is "skins":
+    open virtual chest with 3 rows named "{@title-skins}" to {_p}
+    set {_slot} to 0
+    loop {cookieclicker.skins::*}:
+      set {_data::*} to split(loop-value, "|")
+      set {_name} to {_data::1}
+      set {_icon} to {_data::2}
+      set {_unlocked} to {_data::4}
+      set {_selected} to " "
+      if loop-index is {_skin}:
+        set {_selected} to "&a(Selected)"
+      if {_unlocked} is "true" or {cookieclicker.unlocked.%{_uuid}%::%loop-index%} is true:
+        set slot {_slot} of {_p}'s current inventory to {_icon} named "&e%{_name}% %{_selected}%" with lore "&7Click to select!"
+      else:
+        set slot {_slot} of {_p}'s current inventory to barrier named "&7???"
+      add 1 to {_slot}
+    set slot 26 of {_p}'s current inventory to barrier named "&cBack"
+  else if {_guiname} is "achievements":
+    open virtual chest with 3 rows named "{@title-achievements}" to {_p}
+    set slot 13 of {_p}'s current inventory to paper named "&fNo achievements yet!"
+    set slot 26 of {_p}'s current inventory to barrier named "&cBack"
+  else if {_guiname} is "upgrades":
+    open virtual chest with 3 rows named "{@title-upgrades}" to {_p}
+    set slot 13 of {_p}'s current inventory to diamond named "&bNo upgrades yet!"
+    set slot 26 of {_p}'s current inventory to barrier named "&cBack"
+  else if {_guiname} is "leaderboards":
+    open virtual chest with 3 rows named "{@title-leaderboards}" to {_p}
+    set {_sorted::*} to sorted {cookieclicker.cookies::*} by value descending
+    set {_place} to 1
+    loop {_sorted::*}:
+      set slot {_place} of {_p}'s current inventory to player head of uuid "%loop-index%" named "&e%loop-index%" with lore "&7Cookies: &e%{cookieclicker.cookies::%loop-index%}%"
+      add 1 to {_place}
+      if {_place} > 5:
+        stop loop
+    set slot 21 of {_p}'s current inventory to paper named "&bDaily Leaderboard"
+    set slot 22 of {_p}'s current inventory to paper named "&bWeekly Leaderboard"
+    set slot 26 of {_p}'s current inventory to barrier named "&cBack"
+  else if {_guiname} is "dailyleaderboard":
+    open virtual chest with 3 rows named "&bDaily Leaderboard" to {_p}
+    set {_date} to now formatted as "yyyy-MM-dd"
+    set {_sorted::*} to sorted {cookieclicker.dailycookies::%{_date}%::*} by value descending
+    set {_place} to 1
+    loop {_sorted::*}:
+      set slot {_place} of {_p}'s current inventory to player head of uuid "%loop-index%" named "&e%loop-index%" with lore "&7Daily Cookies: &e%{cookieclicker.dailycookies::%{_date}%::%loop-index%}%"
+      add 1 to {_place}
+      if {_place} > 5:
+        stop loop
+    set slot 26 of {_p}'s current inventory to barrier named "&cBack"
+  else if {_guiname} is "weeklyleaderboard":
+    open virtual chest with 3 rows named "&bWeekly Leaderboard" to {_p}
+    set {_week} to difference between now and date(1970, 1, 1) in weeks
+    set {_sorted::*} to sorted {cookieclicker.weeklycookies::%{_week}%::*} by value descending
+    set {_place} to 1
+    loop {_sorted::*}:
+      set slot {_place} of {_p}'s current inventory to player head of uuid "%loop-index%" named "&e%loop-index%" with lore "&7Weekly Cookies: &e%{cookieclicker.weeklycookies::%{_week}%::%loop-index%}%"
+      add 1 to {_place}
+      if {_place} > 5:
+        stop loop
+    set slot 26 of {_p}'s current inventory to barrier named "&cBack"
+  else if {_guiname} is "stats":
+    open virtual chest with 3 rows named "&dPersonal Stats" to {_p}
+    set slot 11 of {_p}'s current inventory to paper named "&eTotal Cookies: &f%{cookieclicker.cookies::%{_uuid}%}%"
+    set slot 12 of {_p}'s current inventory to paper named "&eTotal Clicks: &f%{cookieclicker.clicks::%{_uuid}%}%"
+    set slot 13 of {_p}'s current inventory to paper named "&eCurrent Skin: &f%{cookieclicker.skin::%{_uuid}%}%"
+    set slot 14 of {_p}'s current inventory to paper named "&eDaily Cookies: &f%{cookieclicker.dailycookies::%now formatted as 'yyyy-MM-dd'%::%{_uuid}%}%"
+    set slot 15 of {_p}'s current inventory to paper named "&eWeekly Cookies: &f%{cookieclicker.weeklycookies::%difference between now and date(1970, 1, 1) in weeks%::%{_uuid}%}%"
+    set slot 26 of {_p}'s current inventory to barrier named "&cBack"
+
+on inventory click:
+  set {_uuid} to player's uuid
+  set {_skin} to {cookieclicker.skin::%{_uuid}%}
+  if {_skin} is not set:
+    set {_skin} to "cookie"
+    set {cookieclicker.skin::%{_uuid}%} to "cookie"
+  set {_sdata::*} to split({cookieclicker.skins::%{_skin}%}, "|")
+  set {_cookieicon} to {_sdata::2}
+  set {_bgpane} to {_sdata::3}
+  if name of event-inventory is "{@title-main}":
+    cancel event
+    set {_slot} to {cookieclicker.cookieslot::%player's uuid%}
+    if clicked slot is 36:
+      openCookieGUI(player, "skins")
+      stop
+    if clicked slot is 37:
+      openCookieGUI(player, "achievements")
+      stop
+    if clicked slot is 38:
+      openCookieGUI(player, "upgrades")
+      stop
+    if clicked slot is 39:
+      openCookieGUI(player, "leaderboards")
+      stop
+    if clicked slot is 40:
+      openCookieGUI(player, "stats")
+      stop
+    if clicked slot = {_slot}:
+      add 1 to {cookieclicker.cookies::%player's uuid%}
+      add 1 to {cookieclicker.clicks::%player's uuid%}
+      set {_date} to now formatted as "yyyy-MM-dd"
+      set {_week} to difference between now and date(1970, 1, 1) in weeks
+      add 1 to {cookieclicker.dailycookies::%{_date}%::%player's uuid%}
+      add 1 to {cookieclicker.weeklycookies::%{_week}%::%player's uuid%}
+      set {_newslot} to random integer between 0 and {@cookie-slots} - 1
+      set {cookieclicker.cookieslot::%player's uuid%} to {_newslot}
+      loop {@cookie-slots} times:
+        set slot (loop-number - 1) of event-inventory to {_bgpane} named " "
+      set slot {_newslot} of event-inventory to {_cookieicon} named "&6&lClick Me!" with lore "&7Cookies: &e%{cookieclicker.cookies::%player's uuid%}%||&7Skin: &f%{_sdata::1}%"
+      play sound "entity.experience_orb.pickup" with volume 1 and pitch 2 at player
+  if name of event-inventory is "{@title-skins}":
+    cancel event
+    if clicked slot is 26:
+      openCookieGUI(player, "main")
+      stop
+    loop {cookieclicker.skins::*}:
+      if clicked slot is (loop-number - 1):
+        set {_data::*} to split(loop-value, "|")
+        set {_unlocked} to {_data::4}
+        if {_unlocked} is "true" or {cookieclicker.unlocked.%{_uuid}%::%loop-index%} is true:
+          set {cookieclicker.skin::%{_uuid}%} to loop-index
+          send "&aSelected skin: %{_data::1}%!" to player
+          openCookieGUI(player, "skins")
+        else:
+          send "&cYou don't own this skin!" to player
+  if name of event-inventory is "{@title-achievements}":
+    cancel event
+    if clicked slot is 26:
+      openCookieGUI(player, "main")
+  if name of event-inventory is "{@title-upgrades}":
+    cancel event
+    if clicked slot is 26:
+      openCookieGUI(player, "main")
+  if name of event-inventory is "{@title-leaderboards}":
+    cancel event
+    if clicked slot is 21:
+      openCookieGUI(player, "dailyleaderboard")
+      stop
+    if clicked slot is 22:
+      openCookieGUI(player, "weeklyleaderboard")
+      stop
+    if clicked slot is 26:
+      openCookieGUI(player, "main")
+  if name of event-inventory is "&bDaily Leaderboard":
+    cancel event
+    if clicked slot is 26:
+      openCookieGUI(player, "leaderboards")
+  if name of event-inventory is "&bWeekly Leaderboard":
+    cancel event
+    if clicked slot is 26:
+      openCookieGUI(player, "leaderboards")
+  if name of event-inventory is "&dPersonal Stats":
+    cancel event
+    if clicked slot is 26:
+      openCookieGUI(player, "main")
+
+#---------------------------------
+
+# --- Quick Click Sub-Gamemode ---
+options:
+  quickclick-items: diamond, cookie, apple, golden apple, emerald, stick, iron ingot, bread, carrot, blaze rod,
+
+command /quickclick:
+  trigger:
+    startQuickClick(player)
+
+function startQuickClick(p: player):
+  set {quickclick.streak::%{_p}%} to 0
+  QuickClickNextRound({_p})
+
+function QuickClickNextRound(p: player):
+  set {_items::*} to {@quickclick-items} split by ", "
+  set {_target} to random element out of {_items::*}
+  set {quickclick.target::%{_p}%} to {_target}
+  set {quickclick.starttime::%{_p}%} to now
+  open virtual chest with 3 rows named "&eQuickClick: %{_target}%" to {_p}
+  # Fill with random items
+  loop 27 times:
+    set slot (loop-number - 1) of {_p}'s current inventory to random element out of {_items::*}
+  # Place target item in a random slot
+  set {_targetslot} to random integer between 0 and 26
+  set slot {_targetslot} of {_p}'s current inventory to {_target}
+  set {quickclick.targetslot::%{_p}%} to {_targetslot}
+  # Schedule time-out
+  wait 7 seconds
+  if {quickclick.waiting::%{_p}%} is not set:
+    # Player hasn't clicked, handle as fail
+    QuickClickFail({_p})
+
+on inventory click:
+  if name of event-inventory contains "QuickClick:":
+    cancel event
+    set {_uuid} to player's uuid
+    set {_targetslot} to {quickclick.targetslot::%{_uuid}%}
+    set {_target} to {quickclick.target::%{_uuid}%}
+    set {quickclick.waiting::%{_uuid}%} to true
+    if clicked slot is {_targetslot}:
+      add 1 to {quickclick.streak::%{_uuid}%}
+      if {quickclick.streak::%{_uuid}%} > {quickclick.beststreak::%{_uuid}%}:
+        set {quickclick.beststreak::%{_uuid}%} to {quickclick.streak::%{_uuid}%}
+      send "&aCorrect! Streak: %{quickclick.streak::%{_uuid}%}% (Best: %{quickclick.beststreak::%{_uuid}%}%)" to player
+      wait 1 tick
+      delete {quickclick.waiting::%{_uuid}%}
+      QuickClickNextRound(player)
+    else:
+      QuickClickFail(player)
+
+function QuickClickFail(p: player):
+  set {_uuid} to {_p}'s uuid
+  set {quickclick.streak::%{_uuid}%} to 0
+  send "&cWrong or too slow! Streak reset." to {_p}
+  wait 1 second
+  delete {quickclick.waiting::%{_uuid}%}
+  QuickClickNextRound({_p})
+
+command /quickclickstats:
+  trigger:
+    send "&eYour best QuickClick streak: &a%{quickclick.beststreak::%player's uuid%}%"
+
+command /quickclickleaderboard:
+  trigger:
+    openQuickClickLeaderboard(player)
+
+function openQuickClickLeaderboard(p: player):
+  open virtual chest with 3 rows named "&6Quick Click Leaderboard" to {_p}
+  set {_sorted::*} to sorted {quickclick.beststreak::*} by value descending
+  set {_place} to 0
+  loop {_sorted::*}:
+    add 1 to {_place}
+    set slot {_place} of {_p}'s current inventory to player head of uuid "%loop-index%" named "&e%loop-index%" with lore "&7Best Streak: &a%{quickclick.beststreak::%loop-index%}%"
+    if {_place} >= 10:
+      stop loop
+  set slot 26 of {_p}'s current inventory to barrier named "&cClose"
