@@ -47,13 +47,8 @@ on death of player:
     set {slot%{currentslot::%player%}%::%player%} to "locked"
     kick player for 5 minutes with "&cYou died! Come back in 5 minutes."
 
-on inventory close:
-    if name of event-inventory = "&7Slot Select":
-        if {joingui::%player%} = true:
-            joingui(player)
-
 function joingui(p: player):
-    open chest with 3 rows named "&7Slot Select" to p
+    open chest with 3 rows named "&7Slot Select" to {_p}
     format slot 0 to 26 with gray stained glass pane named "&7"
     #
     set {_slots::*} to 11, 13, 15
@@ -61,7 +56,7 @@ function joingui(p: player):
         set {_i} to loop-number
         if {slot%{_i}%::%p%} is set:
             if {slot%{_i}%::%p%} = "alive":
-                format slot loop-value with lime stained glass pane named "&aClick to play!" with lore "%nl%&7Platime: &a%playtime(player)%"
+                format slot loop-value with lime stained glass pane named "&aClick to play!" with lore "%nl%&7Platime: &a%playtime({_p})%"
             else:
                 format slot loop-value with red stained glass pane named "&cSlot Locked..."
         else:
@@ -83,16 +78,45 @@ on inventory click:
             send "{@prefix}&fYou have selected Slot %{_slot}%!" to player
             set {currentslot::%player%} to {_slot}
             if {class::%player%} is not set:
+                set {joingui::%player%} to false
+                set {classgui::%player%} to true
                 classgui(player)
+            else:
+                loadslot(player)
         if clicked item is red stained glass pane:
-            send "{@prefix}&cThis slot is locked! Reset it in the slot menu to play."
+            resetslot(player)
+            joingui(player)
         if clicked item is light gray stained glass pane:
             send "{@prefix}&cThis slot is inactive."
 
-fuction classgui(p: player)
+on inventory close:
+    if name of event-inventory = "&7Slot Select":
+        if {joingui::%player%} = true:
+            wait 1 second
+            joingui(player)
+    else if name of event-inventory = "&7Class Select":
+        if {classgui::%player%} = true:
+            wait 1 second
+            classgui(player)
+
+function loadslot(p: player):
+
+function resetslot(p: player):
+
+fuction classgui(p: player):
 
 every 1 second:
     add 1 to {playtime::%{currentslot::%player%}%::%player%}
 
-function playtime(p: player)
-    
+function playtime(p: player):
+    set {_total} to {playtime::%{currentslot::%p%}%::%p%}
+    set {_s} to {_total} mod 60
+    if {_s} < 10:
+        set {_s} to "%0{_s}%"
+    set {_m} to floor({_total} / 60) mod 60
+    if {_m} < 10:
+        set {_m} to "%0{_s}%"
+    set {_h} to floor({_total} / 3600)
+    if {_h} < 10:
+        set {_h} to "%0{_s}%"
+    return "%{_h}%:%{_m}%:%{_s}%"
