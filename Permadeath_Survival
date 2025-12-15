@@ -67,7 +67,12 @@ on inventory click:
     if name of event-inventory = "&7Slot Select":
         cancel event
         if clicked item is lime stained glass pane:
-            set {_slot} to loop-index
+            if clicked slot = 11:
+                set {_slot} to 1
+            if clicked slot = 13:
+                set {_slot} to 2
+            if clicked slot = 15:
+                set {_slot} to 3
             play sound "ENTITY_PLAYER_LEVELUP" to player
             set {joingui::%player%} to false
             close player's inventory
