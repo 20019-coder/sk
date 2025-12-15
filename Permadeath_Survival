@@ -5,7 +5,7 @@ Core Gameplay
   Save Slots:
     Each player has 3 save slots.
     On join, players must pick a save slot via a GUI.
-    Each save slot stores independent progress (inventory, location, stats, etc.).
+    Each save slot stores independent progress (inventory, location, stats, etc.)(Shows stats of slot in the slot select gui EX: playtime 2h 5m 48s)
   Auto-save: Player progress is automatically saved every 60 seconds.
     Death Consequence: If a player dies while using a save slot:
     That save slot becomes locked.
@@ -32,9 +32,12 @@ Player Utilities
 options:
     prefix: &2[&aSurviva&2] » &f
     #
-    tkick: 5 minutes
-    asave: 1 minute
+    kick: 5 minutes
+    save: 1 minute
 
+on first join:
+    loop 1 to 3:
+        set {slot%loop-number%::%player%} to "inactive"
 
 on join:
     joingui(player)
@@ -45,21 +48,34 @@ on inventory close:
         if {joingui::%player%} = true:
             joingui(player)
 
-function joingui(p: player)
-    open chest with 3 rows named "&7Slot Select" to player
-    format slot (integers 0 to 26) with gray stained glass pane named "&7"
-    loop 3 times:
-        if loop-number = 1:
-            set {_slot} to 11
-        if loop-number = 2:
-            set {_slot} to 13
-        if loop-number = 3:
-            set {_slot} to 15
-        #
-        if {slot%loop-number%::%player%} is set:
-            if {slot%loop-number%::%player%} = "alive":
-                format slot {_slot} with lime stained glass pane named "&aClick to play!"
+function joingui(p: player):
+    open chest with 3 rows named "&7Slot Select" to p
+    format slot 0 to 26 with gray stained glass pane named "&7"
+    #
+    set {_slots::*} to 11, 13, 15
+    loop {_slots::*}:
+        set {_i} to loop-number
+        if {slot%{_i}%::%p%} is set:
+            if {slot%{_i}%::%p%} = "alive":
+                format slot loop-value with lime stained glass pane named "&aClick to play!"
             else:
-                format slot {_slot} with red stained glass pane named "&cSlot Locked..."
+                format slot loop-value with red stained glass pane named "&cSlot Locked..."
         else:
-            format slot {_slot} with light gray stained glass pane named "&7Slot Inactive."
+            format slot loop-value with light gray stained glass pane named "&7Slot Inactive."
+
+on inventory click:
+    if name of event-inventory = "&7Slot Select":
+        cancel event
+        if clicked item is lime stained glass pane:
+            set {_slot} to loop-index
+            play sound "ENTITY_PLAYER_LEVELUP" to player
+            set {joingui::%player%} to false
+            close player's inventory
+            send "{@prefix}&fYou have selected Slot %{_slot}%!" to player
+            set {currentslot::%player%} to {_slot}
+            if {class::%player%} is not set:
+                classgui(player)
+        if clicked item is red stained glass pane:
+            send "{@prefix}&cThis slot is locked! Reset it in the slot menu to play."
+        if clicked item is light gray stained glass pane:
+            send "{@prefix}&cThis slot is inactive."
