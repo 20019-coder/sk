@@ -1,10 +1,3 @@
-/skript/
-├── main.sk (Core event handlers)
-├── permadeath.sk (Death handling & timer system)
-├── saveslots.sk (Save/load mechanics)
-├── classes.sk (Class management)
-├── utilities.sk (TPA, RTP, Homes)
-
 Core Gameplay
   Permadeath:
     When a player dies, they are kicked from the server for 5 minutes.
@@ -33,6 +26,7 @@ Player Utilities
     Home GUI Players can set, unset, or teleport to homes.
     Each home can be named for easy identification.
     Maximum of 5 homes per player.
+
 ===========================================================================================
 
 options:
@@ -43,10 +37,29 @@ options:
 
 
 on join:
+    joingui(player)
+    set {joingui::%player%} to true
+
+on inventory close:
+    if name of event-inventory = "&7Slot Select":
+        if {joingui::%player%} = true:
+            joingui(player)
 
 function joingui(p: player)
-    open chest with 3 rows named " " to player
+    open chest with 3 rows named "&7Slot Select" to player
     format slot (integers 0 to 26) with gray stained glass pane named "&7"
-    if {slot1::%player%} is set:
-    else:
-        format slot 11 with light grays tained glass pane named "&7Slot Inactive"
+    loop 3 times:
+        if loop-number = 1:
+            set {_slot} to 11
+        if loop-number = 2:
+            set {_slot} to 13
+        if loop-number = 3:
+            set {_slot} to 15
+        #
+        if {slot%loop-number%::%player%} is set:
+            if {slot%loop-number%::%player%} = "alive":
+                format slot {_slot} with lime stained glass pane named "&aClick to play!"
+            else:
+                format slot {_slot} with red stained glass pane named "&cSlot Locked..."
+        else:
+            format slot {_slot} with light gray stained glass pane named "&7Slot Inactive."
