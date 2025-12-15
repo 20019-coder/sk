@@ -1,0 +1,52 @@
+/skript/
+├── main.sk (Core event handlers)
+├── permadeath.sk (Death handling & timer system)
+├── saveslots.sk (Save/load mechanics)
+├── classes.sk (Class management)
+├── utilities.sk (TPA, RTP, Homes)
+
+Core Gameplay
+  Permadeath:
+    When a player dies, they are kicked from the server for 5 minutes.
+    After 5 minutes, they can rejoin and choose a save slot to continue.
+  Save Slots:
+    Each player has 3 save slots.
+    On join, players must pick a save slot via a GUI.
+    Each save slot stores independent progress (inventory, location, stats, etc.).
+  Auto-save: Player progress is automatically saved every 60 seconds.
+    Death Consequence: If a player dies while using a save slot:
+    That save slot becomes locked.
+    The player cannot use that slot until they manually reset it via the save slot GUI.
+    Resetting a slot clears all previous progress on that slot.
+  Classes:
+    Players must pick a class via a GUI if none is assigned yet.
+    22 unique classes, each providing slightly different attributes, effects, or actions.
+    Example class differences:
+    Health, speed, or strength modifiers
+    Passive buffs (fire resistance, regeneration, night vision)
+    Special actions (temporary flight, summon pets, extra loot drops)
+Player Utilities
+  TPA System: Players can request teleport to other players; requests must be accepted.
+  RTP (Random Teleport): Teleports players to a random location within the world.
+  Homes:
+    Players can set up to 5 homes.
+    Home GUI Players can set, unset, or teleport to homes.
+    Each home can be named for easy identification.
+    Maximum of 5 homes per player.
+===========================================================================================
+
+options:
+    prefix: &2[&aSurviva&2] » &f
+    #
+    tkick: 5 minutes
+    asave: 1 minute
+
+
+on join:
+
+function joingui(p: player)
+    open chest with 3 rows named " " to player
+    format slot (integers 0 to 26) with gray stained glass pane named "&7"
+    if {slot1::%player%} is set:
+    else:
+        format slot 11 with light grays tained glass pane named "&7Slot Inactive"
