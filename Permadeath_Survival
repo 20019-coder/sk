@@ -84,3 +84,10 @@ on inventory click:
             send "{@prefix}&cThis slot is locked! Reset it in the slot menu to play."
         if clicked item is light gray stained glass pane:
             send "{@prefix}&cThis slot is inactive."
+
+on death of player:
+    set {slot%{currentslot::%player%}%::%player%} to "locked"
+    kick player for 5 minutes with "&cYou died! Come back in 5 minutes."
+
+every 1 second:
+    add 1 to {playtime::%player%} and {playtime::%{currentslot::%player%}%::%player%}
