@@ -40,11 +40,14 @@ on first join:
         set {slot%loop-number%::%player%} to "inactive"
 
 on join:
+    clear player's inventory
+    set player's gamemode to spectator
     joingui(player)
     set {joingui::%player%} to true
 
 on death of player:
     set {slot%{currentslot::%player%}%::%player%} to "locked"
+    resetslot(player)
     kick player for 5 minutes with "&cYou died! Come back in 5 minutes."
 
 function joingui(p: player):
@@ -100,6 +103,7 @@ on inventory close:
             classgui(player)
 
 function loadslot(p: player):
+    
 
 function resetslot(p: player):
 
@@ -109,7 +113,7 @@ every 1 second:
     add 1 to {playtime::%{currentslot::%player%}%::%player%}
 
 function playtime(p: player):
-    set {_total} to {playtime::%{currentslot::%p%}%::%p%}
+    set {_total} to {playtime::%{currentslot::%{_p}%}%::%{_p}%}
     set {_s} to {_total} mod 60
     if {_s} < 10:
         set {_s} to "%0{_s}%"
