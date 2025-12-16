@@ -1,0 +1,16 @@
+on first join:
+    set {kills::%player%} to 0
+    set {deaths::%player%} to 0
+    #
+    random(player)
+
+function random(p: player):
+    set {_arm::*} to chestplate, leggings, boots
+    set {_arm} to random element out of {_arm::*}
+    set {_p}'s chestplate to chainmail chestplate
+    set {_p}'s leggings to chainmail leggings
+    set {_p}'s boots to chainmail boots
+    set {_p}'s {_arm} to iron {_arm}
+    give {_p} iron sword
+    give {_p} bow
+    set {_p}'s offhand to 8 arrow
