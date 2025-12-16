@@ -65,6 +65,231 @@ function joingui(p: player):
         else:
             format slot loop-value with light gray stained glass pane named "&7Slot Inactive."
 
+function classgui(p: player):
+    open chest with 6 rows named "&7Class Selection" to {_p}
+    format slot 9 to 44 with gray stained glass pane named "&7"
+    
+    # Define class data (you can expand this list to 22 classes)
+    set {_classes::*} to "warrior", "archer", "mage", "tank", "rogue", "healer", "berserker", "ninja", "paladin", "assassin", "ranger", "sorcerer", "knight", "thief", "cleric", "barbarian", "monk", "bard", "druid", "summoner", "shaman", "warlock"
+    
+    # Format classes in grid (4x5 grid starting at slot 10)
+    set {_row} to 1
+    set {_col} to 1
+    set {_index} to 0
+    
+    loop {_classes::*}:
+        set {_index} to {_index} + 1
+        set {_slot} to (10 + ({_row} - 1) * 9 + ({_col} - 1))
+        
+        # Get class display name and info
+        set {_class_name} to loop-value
+        set {_display_name} to capitalize({_class_name})
+        set {_lore::*} to ""
+        add "&7Class: &e%{_display_name}%" to {_lore::*}
+        add "&8&m-------------------" to {_lore::*}
+        
+        # Add class-specific lore based on class type
+        if {_class_name} contains "warrior":
+            add "&7Health: &a+10%" to {_lore::*}
+            add "&7Strength: &a+5%" to {_lore::*}
+            add "&7Speed: &c-2%" to {_lore::*}
+        else if {_class_name} contains "archer":
+            add "&7Ranged Damage: &a+15%" to {_lore::*}
+            add "&7Movement Speed: &a+8%" to {_lore::*}
+            add "&7Health: &c-5%" to {_lore::*}
+        else if {_class_name} contains "mage":
+            add "&7Magic Power: &a+20%" to {_lore::*}
+            add "&7Mana Regen: &a+10%" to {_lore::*}
+            add "&7Health: &c-15%" to {_lore::*}
+        else if {_class_name} contains "tank":
+            add "&7Health: &a+25%" to {_lore::*}
+            add "&7Defense: &a+15%" to {_lore::*}
+            add "&7Speed: &c-8%" to {_lore::*}
+        else if {_class_name} contains "rogue":
+            add "&7Critical Chance: &a+12%" to {_lore::*}
+            add "&7Evasion: &a+10%" to {_lore::*}
+            add "&7Health: &c-8%" to {_lore::*}
+        else if {_class_name} contains "healer":
+            add "&7Heal Power: &a+18%" to {_lore::*}
+            add "&7Regeneration: &a+8%" to {_lore::*}
+            add "&7Damage: &c-10%" to {_lore::*}
+        else if {_class_name} contains "berserker":
+            add "&7Damage: &a+25% when low HP" to {_lore::*}
+            add "&7Speed: &a+5% when low HP" to {_lore::*}
+            add "&7Defense: &c-15%" to {_lore::*}
+        else if {_class_name} contains "ninja":
+            add "&7Invisibility: &aTemporary stealth" to {_lore::*}
+            add "&7Speed: &a+12%" to {_lore::*}
+            add "&7Health: &c-10%" to {_lore::*}
+        else if {_class_name} contains "paladin":
+            add "&7Blessing: &aFire Resistance" to {_lore::*}
+            add "&7Healing: &a+10%" to {_lore::*}
+            add "&7Damage: &a+5%" to {_lore::*}
+        else if {_class_name} contains "assassin":
+            add "&7Backstab: &a+50% damage from behind" to {_lore::*}
+            add "&7Sneak Speed: &a+20%" to {_lore::*}
+            add "&7Health: &c-12%" to {_lore::*}
+        else if {_class_name} contains "ranger":
+            add "&7Arrow Damage: &a+20%" to {_lore::*}
+            add "&7Pet Companion: &aWolf ally" to {_lore::*}
+            add "&7Health: &a+5%" to {_lore::*}
+        else if {_class_name} contains "sorcerer":
+            add "&7Spell Variety: &aExtra spells" to {_lore::*}
+            add "&7Mana Efficiency: &a+15%" to {_lore::*}
+            add "&7Health: &c-10%" to {_lore::*}
+        else if {_class_name} contains "knight":
+            add "&7Block Chance: &a+10%" to {_lore::*}
+            add "&7Defense: &a+12%" to {_lore::*}
+            add "&7Speed: &c-3%" to {_lore::*}
+        else if {_class_name} contains "thief":
+            add "&7Loot Bonus: &a+15% rare items" to {_lore::*}
+            add "&7Lockpicking: &aFast chest opening" to {_lore::*}
+            add "&7Health: &c-5%" to {_lore::*}
+        else if {_class_name} contains "cleric":
+            add "&7Buffs: &aParty healing/boosts" to {_lore::*}
+            add "&7Resistance: &a+8% to all damage" to {_lore::*}
+            add "&7Damage: &c-5%" to {_lore::*}
+        else if {_class_name} contains "barbarian":
+            add "&7Fury: &aDamage increases with rage" to {_lore::*}
+            add "&7Knockback: &a+15% stronger" to {_lore::*}
+            add "&7Defense: &c-5%" to {_lore::*}
+        else if {_class_name} contains "monk":
+            add "&7Martial Arts: &aMelee combo attacks" to {_lore::*}
+            add "&7Stamina: &a+20% regeneration" to {_lore::*}
+            add "&7Armor: &cNo armor allowed" to {_lore::*}
+        else if {_class_name} contains "bard":
+            add "&7Songs: &aParty buffs" to {_lore::*}
+            add "&7Charisma: &a+10% merchant discounts" to {_lore::*}
+            add "&7Damage: &c-5%" to {_lore::*}
+        else if {_class_name} contains "druid":
+            add "&7Nature Magic: &aPlant growth + animal taming" to {_lore::*}
+            add "&7Regeneration: &a+5% health regen" to {_lore::*}
+            add "&7Health: &a+8%" to {_lore::*}
+        else if {_class_name} contains "summoner":
+            add "&7Minions: &aSummon creatures" to {_lore::*}
+            add "&7Mana Cost: &a-10% for summons" to {_lore::*}
+            add "&7Health: &c-12%" to {_lore::*}
+        else if {_class_name} contains "shaman":
+            add "&7Totems: &aPlace powerful totems" to {_lore::*}
+            add "&7Spirit Damage: &a+15%" to {_lore::*}
+            add "&7Health: &a+5%" to {_lore::*}
+        else if {_class_name} contains "warlock":
+            add "&7Pact: &aDemon companion" to {_lore::*}
+            add "&7Life Steal: &a+8% damage dealt" to {_lore::*}
+            add "&7Health: &c-8%" to {_lore::*}
+        
+        add "&8&m-------------------" to {_lore::*}
+        add "&7&oClick to select this class" to {_lore::*}
+        
+        # Determine item based on class type
+        if {_class_name} contains "warrior" or {_class_name} contains "tank" or {_class_name} contains "knight" or {_class_name} contains "berserker" or {_class_name} contains "barbarian":
+            format slot {_slot} with iron sword named "&e%{_display_name}%" with lore {_lore::*}
+        else if {_class_name} contains "archer" or {_class_name} contains "ranger" or {_class_name} contains "assassin":
+            format slot {_slot} with bow named "&e%{_display_name}%" with lore {_lore::*}
+        else if {_class_name} contains "mage" or {_class_name} contains "sorcerer" or {_class_name} contains "warlock" or {_class_name} contains "shaman":
+            format slot {_slot} with blaze rod named "&e%{_display_name}%" with lore {_lore::*}
+        else if {_class_name} contains "rogue" or {_class_name} contains "ninja" or {_class_name} contains "thief":
+            format slot {_slot} with golden sword named "&e%{_display_name}%" with lore {_lore::*}
+        else if {_class_name} contains "healer" or {_class_name} contains "paladin" or {_class_name} contains "cleric" or {_class_name} contains "monk":
+            format slot {_slot} with golden apple named "&e%{_display_name}%" with lore {_lore::*}
+        else if {_class_name} contains "bard":
+            format slot {_slot} with music disc named "&e%{_display_name}%" with lore {_lore::*}
+        else if {_class_name} contains "druid":
+            format slot {_slot} with oak sapling named "&e%{_display_name}%" with lore {_lore::*}
+        else if {_class_name} contains "summoner":
+            format slot {_slot} with bone named "&e%{_display_name}%" with lore {_lore::*}
+        else:
+            format slot {_slot} with diamond named "&e%{_display_name}%" with lore {_lore::*}
+        
+        set {_col} to {_col} + 1
+        if {_col} > 5:
+            set {_col} to 1
+            set {_row} to {_row} + 1
+        if {_row} > 4:
+            stop loop # Prevent going beyond available slots
+
+function applyclass(p: player):
+    set {_class} to {class::%{_p}%}
+    if {_class} is set:
+        # Clear any existing class effects
+        execute console command "effect clear %{_p}%"
+        
+        # Apply class-specific effects
+        if {_class} contains "warrior":
+            set {_health} to 22 # 11 hearts instead of 10
+            set {_speed} to 0.2 # Slightly slower
+        else if {_class} contains "archer":
+            set {_speed} to 0.25 # Faster movement
+            set {_health} to 18 # Slightly less health
+        else if {_class} contains "mage":
+            set {_health} to 16 # Less health
+            # Could add mana system here
+        else if {_class} contains "tank":
+            set {_health} to 26 # More health (13 hearts)
+            execute console command "effect give %{_p}% minecraft:resistance 1000000 1"
+        else if {_class} contains "rogue":
+            set {_speed} to 0.23 # Fast movement
+            set {_health} to 18 # Less health
+        else if {_class} contains "healer":
+            set {_health} to 22 # More health
+            execute console command "effect give %{_p}% minecraft:regeneration 1000000 0"
+        else if {_class} contains "berserker":
+            set {_health} to 20 # Normal health
+            execute console command "effect give %{_p}% minecraft:strength 1000000 1"
+        else if {_class} contains "ninja":
+            set {_speed} to 0.24 # Very fast
+            set {_health} to 18 # Less health
+        else if {_class} contains "paladin":
+            set {_health} to 24 # High health
+            execute console command "effect give %{_p}% minecraft:fire_resistance 1000000 0"
+        else if {_class} contains "assassin":
+            set {_speed} to 0.23 # Fast
+            set {_health} to 18 # Less health
+        else if {_class} contains "ranger":
+            set {_health} to 20 # Normal health
+            set {_speed} to 0.22 # Slightly faster
+        else if {_class} contains "sorcerer":
+            set {_health} to 16 # Less health
+            execute console command "effect give %{_p}% minecraft:slow_falling 1000000 0"
+        else if {_class} contains "knight":
+            set {_health} to 24 # High health
+            execute console command "effect give %{_p}% minecraft:resistance 1000000 0"
+        else if {_class} contains "thief":
+            set {_speed} to 0.24 # Very fast
+            set {_health} to 18 # Less health
+        else if {_class} contains "cleric":
+            set {_health} to 22 # More health
+            execute console command "effect give %{_p}% minecraft:absorption 1000000 0"
+        else if {_class} contains "barbarian":
+            set {_health} to 20 # Normal health
+            execute console command "effect give %{_p}% minecraft:strength 1000000 0"
+        else if {_class} contains "monk":
+            set {_health} to 20 # Normal health
+            set {_speed} to 0.25 # Fast movement
+        else if {_class} contains "bard":
+            set {_health} to 20 # Normal health
+            set {_speed} to 0.22 # Slightly faster
+        else if {_class} contains "druid":
+            set {_health} to 22 # More health
+            execute console command "effect give %{_p}% minecraft:night_vision 1000000 0"
+        else if {_class} contains "summoner":
+            set {_health} to 18 # Less health
+            execute console command "effect give %{_p}% minecraft:slowness 1000000 0"
+        else if {_class} contains "shaman":
+            set {_health} to 20 # Normal health
+            execute console command "effect give %{_p}% minecraft:mining_fatigue 1000000 0"
+        else if {_class} contains "warlock":
+            set {_health} to 18 # Less health
+            execute console command "effect give %{_p}% minecraft:weakness 1000000 0"
+        
+        # Apply health adjustment (this would need a custom health system)
+        # For now, we'll just send a message about the class selection
+        send "&7&m-------------------------" to {_p}
+        send "&a&lCLASS SELECTED!" to {_p}
+        send "&7You are now a &e%{class::%{_p}%}%&7!" to {_p}
+        send "&7Your class abilities will take effect." to {_p}
+        send "&7&m-------------------------" to {_p}
+
 on inventory click:
     if name of event-inventory = "&7Slot Select":
         cancel event
@@ -91,6 +316,83 @@ on inventory click:
             joingui(player)
         if clicked item is light gray stained glass pane:
             send "{@prefix}&cThis slot is inactive."
+    else if name of event-inventory = "&7Class Selection":
+        cancel event
+        if {classgui::%player%} is true:
+            if clicked slot >= 10 and clicked slot <= 43: # Class slots area
+                if clicked item is not air:
+                    set {_item_name} to name of clicked item
+                    # Extract class name from item name (remove color codes)
+                    replace all "§" and "0" and "1" and "2" and "3" and "4" and "5" and "6" and "7" and "8" and "9" and "a" and "b" and "c" and "d" and "e" and "f" and "r" in {_item_name}
+                    replace all "&" and "e" and "7" and " " in {_item_name}
+                    
+                    # Find which class was clicked by checking lore
+                    set {_clicked_class} to "unknown"
+                    loop 1 to 22:
+                        set {_class_check} to "%loop-value%"
+                        if {_class_check} = 1:
+                            set {_class_name} to "warrior"
+                        else if {_class_check} = 2:
+                            set {_class_name} to "archer"
+                        else if {_class_check} = 3:
+                            set {_class_name} to "mage"
+                        else if {_class_check} = 4:
+                            set {_class_name} to "tank"
+                        else if {_class_check} = 5:
+                            set {_class_name} to "rogue"
+                        else if {_class_check} = 6:
+                            set {_class_name} to "healer"
+                        else if {_class_check} = 7:
+                            set {_class_name} to "berserker"
+                        else if {_class_check} = 8:
+                            set {_class_name} to "ninja"
+                        else if {_class_check} = 9:
+                            set {_class_name} to "paladin"
+                        else if {_class_check} = 10:
+                            set {_class_name} to "assassin"
+                        else if {_class_check} = 11:
+                            set {_class_name} to "ranger"
+                        else if {_class_check} = 12:
+                            set {_class_name} to "sorcerer"
+                        else if {_class_check} = 13:
+                            set {_class_name} to "knight"
+                        else if {_class_check} = 14:
+                            set {_class_name} to "thief"
+                        else if {_class_check} = 15:
+                            set {_class_name} to "cleric"
+                        else if {_class_check} = 16:
+                            set {_class_name} to "barbarian"
+                        else if {_class_check} = 17:
+                            set {_class_name} to "monk"
+                        else if {_class_check} = 18:
+                            set {_class_name} to "bard"
+                        else if {_class_check} = 19:
+                            set {_class_name} to "druid"
+                        else if {_class_check} = 20:
+                            set {_class_name} to "summoner"
+                        else if {_class_check} = 21:
+                            set {_class_name} to "shaman"
+                        else if {_class_check} = 22:
+                            set {_class_name} to "warlock"
+                        
+                        if lowercase({_item_name}) contains {_class_name}:
+                            set {_clicked_class} to {_class_name}
+                            break loop
+                    
+                    if {_clicked_class} is not "unknown":
+                        set {class::%player%} to {_clicked_class}
+                        set {classgui::%player%} to false
+                        close player's inventory
+                        play sound "ENTITY_PLAYER_LEVELUP" to player
+                        send "{@prefix}&fYou have selected the &e%{class::%player%}% &fclass!" to player
+                        applyclass(player)
+                        loadslot(player)
+                    else:
+                        send "{@prefix}&cCould not identify class. Please try again." to player
+                else:
+                    send "{@prefix}&cInvalid class selection." to player
+            else:
+                send "{@prefix}&cPlease click on a class to select it." to player
 
 on inventory close:
     if name of event-inventory = "&7Slot Select":
@@ -103,11 +405,38 @@ on inventory close:
             classgui(player)
 
 function loadslot(p: player):
-    
+    # Load player's saved data for their selected slot
+    # This would include:
+    # - Inventory contents
+    # - Location
+    # - Health
+    # - XP
+    # - Effects
+    set {joingui::%{_p}%} to false
+    set player's gamemode to survival
+    clear player's inventory
+    # Set player position (example - you'd load from save data)
+    # teleport {_p} to {location::%{currentslot::%{_p}%}%::%{_p}%}
+    # Load inventory (example - you'd load actual saved items)
+    # This is where you'd restore the player's saved inventory
+    # Apply class effects
+    if {class::%{_p}%} is set:
+        applyclass({_p})
+    # Send confirmation
+    send "{@prefix}&fLoading slot %{currentslot::%{_p}%}%..." to {_p}
+    send "{@prefix}&fWelcome back! You are playing as a &e{class::%{_p}%}&f." to {_p}
+    # Set slot status to alive
+    set {%{currentslot::%{_p}%}%::%{_p}%} to "alive"
 
 function resetslot(p: player):
-
-fuction classgui(p: player):
+    # Reset the current slot's data
+    set {%{currentslot::%{_p}%}%::%{_p}%} to "inactive"
+    delete {playtime::%{currentslot::%{_p}%}%::%{_p}%}
+    # Delete other slot-related data like location, inventory, etc.
+    # delete {location::%{currentslot::%{_p}%}%::%{_p}%}
+    # delete {inventory::%{currentslot::%{_p}%}%::%{_p}%}
+    # ... other saved data
+    send "{@prefix}&fSlot %{currentslot::%{_p}%}% has been reset." to {_p}
 
 every 1 second:
     add 1 to {playtime::%{currentslot::%player%}%::%player%}
