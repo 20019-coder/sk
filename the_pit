@@ -12,6 +12,18 @@ on death of player:
     add 1 to {deaths::%player%}
     if attacker is player:
         add 1 to {kills::%player%}
+        #
+        set {_k} to {kills::%{_attacker}%}
+        set {_d} to {deaths::%{_attacker}%}
+        set {_kdr} to 0
+        if {_d} > 0:
+            set {_kdr} to rounded {_k} / {_d} to 2 decimal places
+        else:
+            set {_kdr} to {_k}
+        set death message to "&c%attacker% &7killed &c%victim% &8| &b%{_k}% &7- &b%{_d}% &8| &9%{_kdr}%"
+    else:
+        set death message to "&c%victim% died"
+    #
     chance of 30%:
         set {_arm::*} to chestplate, leggings, boots
         set {_arm} to random element out of {_arm::*}
